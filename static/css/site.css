@@ -1,0 +1,15 @@
+body {
+  padding-top: 4.5rem;
+}
+.navbar-brand {
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+.card-tablet {
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.card-tablet .card-header {
+  background-color: #007bff;
+  color: white;
+}

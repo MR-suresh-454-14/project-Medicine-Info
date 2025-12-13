@@ -1,0 +1,119 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-13 15:46+0530\n"
+"PO-Revision-Date: 2025-09-13 16:30+0530\n"
+"Last-Translator: Your Name <you@example.com>\n"
+"Language-Team: Tamil <ta@example.com>\n"
+"Language: ta\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\tablet_dis\forms.py:6
+msgid "Search Tablet"
+msgstr "மருந்து தேடல்"
+
+#: .\tablet_dis\forms.py:11
+msgid "Enter Medicine name ( Tablets , Ointments )"
+msgstr "மருந்தின் பெயரை உள்ளிடவும் ( மாத்திரைகள் , பூச்சுகள் )"
+
+#: .\tablet_dis\forms.py:16
+msgid "Please enter a tablet name to search."
+msgstr "தேட மருந்தின் பெயரை உள்ளிடவும்."
+
+#: .\tablet_dis\forms.py:17
+msgid "Please enter at least 2 characters."
+msgstr "குறைந்தபட்சம் 2 எழுத்துக்கள் உள்ளிடவும்."
+
+#: .\tablet_dis\forms.py:24
+msgid "Please enter a tablet name."
+msgstr "மருந்தின் பெயரை உள்ளிடவும்."
+
+#: .\tablet_dis\views.py:23
+#, python-brace-format
+msgid "Benefits and side effects of \"{name}\""
+msgstr "\"{name}\" மருந்தின் நன்மைகள் மற்றும் பக்கவிளைவுகள்"
+
+#: .\templates\tablet_dis\home.html:4
+msgid "Search Tablets"
+msgstr "மருந்துகளை தேடுங்கள்"
+
+#: .\templates\tablet_dis\home.html:8
+msgid "Medicine Information"
+msgstr "மருந்து தகவல்"
+
+#: .\templates\tablet_dis\home.html:9
+msgid "Get clear and simple information about medicines"
+msgstr "மருந்துகள் பற்றிய தெளிவான மற்றும் எளிய தகவலைப் பெறுங்கள்"
+
+#: .\templates\tablet_dis\home.html:15
+msgid "Search for a Tablet"
+msgstr "மருந்து தேடுங்கள்"
+
+#: .\templates\tablet_dis\home.html:22
+msgid "Get  Medicine Info"
+msgstr "மருந்து தகவலைப் பெறுங்கள்"
+
+#: .\templates\tablet_dis\home.html:26
+msgid "Start typing to see suggestions..."
+msgstr "பரிந்துரைகளை காணத் தட்டச்சு செய்யத் தொடங்கவும்..."
+
+#: .\templates\tablet_dis\home.html:34
+msgid ""
+"This information is for educational purposes only. Always consult a "
+"healthcare professional."
+msgstr "இந்த தகவல் கல்வி நோக்கங்களுக்காக மட்டுமே. எப்போதும் மருத்துவரை அணுகவும்."
+
+#: .\templates\tablet_dis\tablet_detail.html:27
+msgid "Safe if used correctly"
+msgstr "சரியாக பயன்படுத்தினால் பாதுகாப்பானது"
+
+#: .\templates\tablet_dis\tablet_detail.html:28
+msgid "Consult doctor if unsure"
+msgstr "சந்தேகம் இருந்தால் மருத்துவரை அணுகவும்"
+
+#: .\templates\tablet_dis\tablet_detail.html:39
+msgid "Benefits"
+msgstr "நன்மைகள்"
+
+#: .\templates\tablet_dis\tablet_detail.html:51
+msgid "Side Effects"
+msgstr "பக்கவிளைவுகள்"
+
+#: .\templates\tablet_dis\tablet_detail.html:63
+msgid "Dosage & Timing"
+msgstr "அளவு & நேரம்"
+
+#: .\templates\tablet_dis\tablet_detail.html:71
+msgid "Age Group"
+msgstr "வயது குழு"
+
+#: .\templates\tablet_dis\tablet_detail.html:79
+msgid "Storage Instructions"
+msgstr "சேமிப்பு வழிமுறைகள்"
+
+#: .\templates\tablet_dis\tablet_detail.html:91
+msgid "Drug Interactions"
+msgstr "மருந்து தொடர்புகள்"
+
+#: .\templates\tablet_dis\tablet_detail.html:111
+msgid ""
+"This information is educational. Please consult a doctor before using this "
+"medicine."
+msgstr "இந்த தகவல் கல்வி நோக்கங்களுக்காக மட்டுமே. மருந்தை பயன்படுத்தும் முன் மருத்துவரை அணுகவும்."
+
+#: .\templates\tablet_dis\tablet_detail.html:116
+msgid "Back to Search"
+msgstr "திரும்பிச் செல்ல"
+
+#: .\templates\tablet_dis\tablet_detail.html:119
+msgid "Share"
+msgstr "பகிரவும்"

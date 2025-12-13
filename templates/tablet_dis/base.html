@@ -1,0 +1,49 @@
+{% load static i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Tablet Info{% endblock title %}</title>
+
+  <!-- Removed Bootstrap -->
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <!-- App Theme CSS (after Bootstrap) -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--color-bg);
+      min-height: 100vh;
+    }
+    .suggestion-item:hover, .suggestion-item.active { background-color: var(--color-primary-50); }
+    .suggestion-item:last-child { border-bottom: none; }
+  </style>
+
+  {% block extra_head %}{% endblock extra_head %}
+</head>
+<body>
+  <!-- Navbar (custom) -->
+  <header class="navbar-zen">
+    <div class="container bar">
+      <a class="nav-brand" href="{% url 'home' %}">💊 Tablet Info</a>
+      <nav class="nav-links">
+        <a class="lang-pill {% if LANGUAGE_CODE == 'en' %}is-active{% endif %}" href="/en{{ request.get_full_path|slice:'3:' }}">English</a>
+        <a class="lang-pill {% if LANGUAGE_CODE == 'ta' %}is-active{% endif %}" href="/ta{{ request.get_full_path|slice:'3:' }}">தமிழ்</a>
+      </nav>
+    </div>
+  </header>
+
+
+
+  <!-- Main Content -->
+  <main class="container spacer-xl">
+    {% block content %}{% endblock content %}
+  </main>
+
+  {% block extra_scripts %}{% endblock extra_scripts %}
+</body>
+</html>

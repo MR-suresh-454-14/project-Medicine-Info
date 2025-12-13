@@ -1,0 +1,152 @@
+{% extends 'tablet_dis/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Search Tablets" %}{% endblock title %}
+
+{% block content %}
+<section class="hero-bg hero">
+  <div class="container">
+    <div style="text-align:center;">
+      <h1 style="font-size: 3rem; margin:0; color: var(--color-ink);">💊 {% trans "Medicine Information" %}</h1>
+      <p style="color: var(--color-subtle); margin-top:8px;">{% trans "Get clear and simple information about medicines" %}</p>
+    </div>
+  </div>
+  
+  
+</section>
+<div class="container spacer-lg" style="max-width: 720px;">
+<div class="container spacer-lg" style="max-width: 720px;">
+    <div class="card-zen" style="padding: 24px;">
+      <h4 class="text-center mb-4">{% trans "Search for a Tablet" %}</h4>
+      <form id="searchForm" onsubmit="redirectToTablet(event)">
+        <div class="autocomplete-container">
+          {{ form.query }}
+          <div id="suggestionsBox" class="suggestions-box" style="display: none;"></div>
+        </div>
+        <button class="btn-zen btn-zen-primary" style="width:100%; margin-top:12px;" type="submit">
+          🔍 {% trans "Get  Medicine Info" %}
+        </button>
+      </form>
+  {% if results %}
+    <div class="card-zen spacer-lg" style="padding: 24px;">
+      <h4 class="mb-3 text-center">
+        {% if LANGUAGE_CODE == "ta" %}
+          🔍 தேடல் முடிவுகள்
+        {% else %}
+          🔍 Search Results
+        {% endif %}
+      </h4>
+      <ul class="list-group">
+        {% for tablet in results %}
+          <li class="list-group-item">
+           {% if LANGUAGE_CODE == "ta" %}
+  <a href="{% url 'tablet_detail' tablet.name_ta %}">
+    {{ tablet.name_ta|default:"தகவல் இல்லை" }}
+  </a>
+{% else %}
+  <a href="{% url 'tablet_detail' tablet.name_en %}">
+    {{ tablet.name_en|default:"Information not available" }}
+  </a>
+{% endif %}
+
+           {% if LANGUAGE_CODE == "ta" %}
+             {{ tablet.name_ta|default:"தகவல் இல்லை" }}
+           {% else %}
+             {{ tablet.name_en|default:"Information not available" }}
+           {% endif %}
+            </a>
+
+            
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+{% endif %}
+
+      <small class="text-muted d-block text-center mt-3">
+        {% trans "Start typing to see suggestions..." %}
+      </small>
+    </div>
+  </div>
+</div>
+
+<div class="container spacer-md">
+  <p class="small disclaimer">
+    ⚠️ {% trans "This information is for educational purposes only. Always consult a healthcare professional." %}
+  </p>
+</div>
+{% endblock content %}
+
+{% block extra_scripts %}
+<script>
+function redirectToTablet(event) {
+  event.preventDefault();
+  const queryInput = document.querySelector('input[name="query"]');
+  const query = queryInput.value.trim();
+  if (query.length > 0) {
+    // Get current language from HTML lang attribute
+    const lang = document.documentElement.lang || 'en';
+    window.location.href = `/${lang}/tablet/${encodeURIComponent(query)}/`;
+  }
+}
+
+const input = document.querySelector('input[name="query"]');
+const suggestionsBox = document.getElementById('suggestionsBox');
+let debounceTimer;
+
+input.addEventListener('keyup', (e) => {
+  if (["ArrowDown","ArrowUp","Enter"].includes(e.key)) {
+    handleKeyNavigation(e);
+    return;
+  }
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(fetchSuggestions, 300);
+});
+
+async function fetchSuggestions() {
+  const q = input.value.trim();
+  if (q.length < 2) { suggestionsBox.style.display = 'none'; return; }
+  try {
+    const response = await fetch(`/autocomplete/?q=${encodeURIComponent(q)}`);
+    const suggestions = await response.json();
+    if (suggestions.length > 0) {
+      suggestionsBox.innerHTML = suggestions
+        .map(item => `<div class="suggestion-item" data-value="${item}">${item}</div>`)
+        .join('');
+      suggestionsBox.style.display = 'block';
+      suggestionsBox.querySelectorAll('.suggestion-item').forEach(item => {
+        item.addEventListener('click', () => {
+          input.value = item.dataset.value;
+          suggestionsBox.style.display = 'none';
+        });
+      });
+    } else { suggestionsBox.style.display = 'none'; }
+  } catch (error) {
+    console.error('Error fetching suggestions:', error);
+    suggestionsBox.style.display = 'none';
+  }
+}
+
+function handleKeyNavigation(e) {
+  const items = suggestionsBox.querySelectorAll('.suggestion-item');
+  if (!items.length) return;
+  let current = suggestionsBox.querySelector('.suggestion-item.active');
+  let index = current ? Array.from(items).indexOf(current) : -1;
+  if (e.key === 'ArrowDown') index = (index + 1) % items.length;
+  else if (e.key === 'ArrowUp') index = index <= 0 ? items.length - 1 : index - 1;
+  else if (e.key === 'Enter' && current) {
+    e.preventDefault();
+    input.value = current.dataset.value;
+    suggestionsBox.style.display = 'none';
+  }
+  items.forEach(item => item.classList.remove('active'));
+  if (items[index]) items[index].classList.add('active');
+}
+
+document.addEventListener('click', (e) => {
+  if (!input.contains(e.target) && !suggestionsBox.contains(e.target)) {
+    suggestionsBox.style.display = 'none';
+  }
+});
+</script>
+{% endblock extra_scripts %}

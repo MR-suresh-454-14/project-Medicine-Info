@@ -1,0 +1,155 @@
+{% extends 'tablet_dis/base.html' %}
+{% load i18n %}
+
+{% block title %}{{ display_name }}{% endblock title %}
+
+{% block content %}
+<div class="container spacer-xl">
+
+  <!-- Tablet Overview -->
+  <section class="hero-bg hero" style="margin-bottom:24px;">
+    <div class="container" style="text-align:center;">
+      <h1 style="margin:0;">💊 {{ display_name }}</h1>
+    </div>
+  </section>
+
+  <!-- Benefits & Side Effects Overview -->
+  {% get_current_language as LANGUAGE_CODE %}
+  <div class="grid-2 spacer-lg">
+    <div>
+      <h5 style="color: #16a34a; margin-bottom: 12px;">{{ texts.label_benefits }}</h5>
+      <ul style="list-style:none; padding:0; margin:0;">
+        {% if LANGUAGE_CODE == "ta" %}
+          {% if tablet.advantages_ta %}
+            {% for line in tablet.advantages_ta.splitlines %}
+              {% if line.strip %}<li>✔️ {{ line }}</li>{% endif %}
+            {% endfor %}
+          {% else %}
+            <li>✔️ {{ texts.not_available }}</li>
+          {% endif %}
+        {% else %}
+          {% if tablet.advantages_en %}
+            {% for line in tablet.advantages_en.splitlines %}
+              {% if line.strip %}<li>✔️ {{ line }}</li>{% endif %}
+            {% endfor %}
+          {% else %}
+            <li>✔️ {{ texts.not_available }}</li>
+          {% endif %}
+        {% endif %}
+      </ul>
+    </div>
+
+    <div>
+      <h5 style="color: #dc2626; margin-bottom: 12px;">{{ texts.label_side_effects }}</h5>
+      <ul style="list-style:none; padding:0; margin:0;">
+        {% if LANGUAGE_CODE == "ta" %}
+          {% if tablet.disadvantages_ta %}
+            {% for line in tablet.disadvantages_ta.splitlines %}
+              {% if line.strip %}<li>⚠️ {{ line }}</li>{% endif %}
+            {% endfor %}
+          {% else %}
+            <li>⚠️ {{ texts.not_available }}</li>
+          {% endif %}
+        {% else %}
+          {% if tablet.disadvantages_en %}
+            {% for line in tablet.disadvantages_en.splitlines %}
+              {% if line.strip %}<li>⚠️ {{ line }}</li>{% endif %}
+            {% endfor %}
+          {% else %}
+            <li>⚠️ {{ texts.not_available }}</li>
+          {% endif %}
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Dosage & Timing -->
+  <div class="spacer-lg">
+    <div class="card-zen" style="padding: 24px;">
+        <h5 style="color: var(--color-primary); margin-bottom: 12px;">{{ texts.label_dosage }}</h5>
+        {% if LANGUAGE_CODE == "ta" %}
+          {% if tablet.dosage_timing_ta %}
+            {% for line in tablet.dosage_timing_ta.splitlines %}
+              {% if line.strip %}<div>{{ line }}</div>{% endif %}
+            {% endfor %}
+          {% else %}
+            <p>{{ texts.not_available }}</p>
+          {% endif %}
+        {% else %}
+          {% if tablet.dosage_timing_en %}
+            {% for line in tablet.dosage_timing_en.splitlines %}
+              {% if line.strip %}<div>{{ line }}</div>{% endif %}
+            {% endfor %}
+          {% else %}
+            <p>{{ texts.not_available }}</p>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Age Group & Storage -->
+  <div class="grid-2 spacer-lg">
+    <div>
+      <div class="card-zen" style="padding: 24px; height: 100%;">
+        <h5 style="color: #0891b2; margin-bottom: 12px;">{{ texts.label_age_group }}</h5>
+        {% if LANGUAGE_CODE == "ta" %}
+          <p>{{ tablet.age_group_ta|default:texts.not_available }}</p>
+        {% else %}
+          <p>{{ tablet.age_group_en|default:texts.not_available }}</p>
+        {% endif %}
+      </div>
+    </div>
+    <div>
+      <div class="card-zen" style="padding: 24px; height: 100%;">
+        <h5 style="color: #64748B; margin-bottom: 12px;">{{ texts.label_storage }}</h5>
+        {% if LANGUAGE_CODE == "ta" %}
+          <p>{{ tablet.storage_ta|default:texts.not_available }}</p>
+        {% else %}
+          <p>{{ tablet.storage_en|default:texts.not_available }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Drug Interactions Accordion -->
+  <div class="spacer-lg">
+    <div class="card-zen" style="padding: 24px;">
+      <h5 style="margin-bottom:12px;">{{ texts.label_interactions }}</h5>
+              <ul style="list-style:none; padding:0; margin:0;">
+                {% if LANGUAGE_CODE == "ta" %}
+                  {% if tablet.interactions_ta %}
+                    {% for line in tablet.interactions_ta.splitlines %}
+                      {% if line.strip %}<li>🔗 {{ line }}</li>{% endif %}
+                    {% endfor %}
+                  {% else %}
+                    <li>🔗 {{ texts.not_available }}</li>
+                  {% endif %}
+                {% else %}
+                  {% if tablet.interactions_en %}
+                    {% for line in tablet.interactions_en.splitlines %}
+                      {% if line.strip %}<li>🔗 {{ line }}</li>{% endif %}
+                    {% endfor %}
+                  {% else %}
+                    <li>🔗 {{ texts.not_available }}</li>
+                  {% endif %}
+                {% endif %}
+              </ul>
+    </div>
+  </div>
+
+  <!-- Doctor Disclaimer -->
+  <div class="disclaimer" style="text-align:center; margin-top: 24px;">{{ texts.disclaimer }}</div>
+
+  <!-- Back & Share Buttons -->
+  <div style="text-align:center; margin-top: 24px;">
+    <a href="{% url 'home' %}" class="btn-zen btn-zen-primary">
+      ⬅️ {% trans "Back to Search" %}
+    </a>
+    <button class="btn-zen btn-zen-accent" onclick="navigator.clipboard.writeText(window.location.href)">
+      🔗 {% trans "Share" %}
+    </button>
+  </div>
+
+</div>
+{% endblock content %}
