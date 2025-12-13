@@ -1,3 +1,4 @@
+# this main script in the project 
 import os
 import json
 import logging
@@ -22,6 +23,7 @@ JSON வடிவில் இவ்வாறு திருப்பவும�
   "storage_en": "...", "storage_ta": "...",
   "interactions_en": "...", "interactions_ta": "..."
 }}
+# "tamil prompt and you can change here"
 
 # நன்மைகள்
 benefits_ta: சரியாக 4–6 வரிகள். ஒவ்வொரு வரியும் ஒரு முழு புள்ளி மட்டும்.
@@ -64,6 +66,7 @@ Provide clear and simple medical information about "{tablet_name}" as a JSON obj
   "storage_en": "...", "storage_ta": "...",
   "interactions_en": "...", "interactions_ta": "..."
 }}
+# "english prompt and you can change here"
 
 # Benefits
 benefits_en: exactly 4–6 lines, one short point per line.

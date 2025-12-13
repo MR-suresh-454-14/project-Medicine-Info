@@ -146,10 +146,29 @@
     <a href="{% url 'home' %}" class="btn-zen btn-zen-primary">
       ⬅️ {% trans "Back to Search" %}
     </a>
-    <button class="btn-zen btn-zen-accent" onclick="navigator.clipboard.writeText(window.location.href)">
-      🔗 {% trans "Share" %}
+    <button class="btn-zen btn-zen-accent"
+        onclick="shareTablet('{{ display_name }}')">
+  🔗 {% trans "Share" %}
     </button>
-  </div>
+
+<script>
+  function shareTablet(title) {
+    const url = window.location.href;
+
+    if (navigator.share) {
+      navigator.share({
+        title: title,
+        text: title,
+        url: url
+      });
+    } else {
+      // Fallback: WhatsApp direct share
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(title + ' ' + url)}`;
+      window.open(whatsappUrl, '_blank');
+    }
+  }
+</script>
+
 
 </div>
 {% endblock content %}
