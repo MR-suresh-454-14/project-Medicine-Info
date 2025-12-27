@@ -2,27 +2,29 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.utils.translation import get_language
 from django.db.models import Q
-from .models import Tablet
-from .forms import TabletSearchForm
-from .scraper import scrape_tablet_details
-import unicodedata  # for Tamil detection
+
+from tablet_dis.models import Tablet
+from tablet_dis.forms import TabletSearchForm
+
+from tablet_dis.services.db_service import get_tablet_from_db
+from tablet_dis.services.save_tablet_service import save_tablet_from_api
+
+import unicodedata
 
 
+# ---------------------------
+# Utility: Tamil detection
+# ---------------------------
 def is_tamil_text(text):
-    """
-    Detect if input contains Tamil characters
-    Tamil Unicode block: 0B80–0BFF
-    """
     if not text:
         return False
-    tamil_range = range(0x0B80, 0x0BFF)
-    return any(ord(char) in tamil_range for char in text)
+    return any(0x0B80 <= ord(char) <= 0x0BFF for char in text)
 
 
+# ---------------------------
+# UI Static Texts
+# ---------------------------
 def _ui_texts(lang):
-    """
-    Provide UI static texts depending on language.
-    """
     if lang == "ta":
         return {
             "label_benefits": "✅ நன்மைகள்",
@@ -48,43 +50,93 @@ def _ui_texts(lang):
     }
 
 
+# ---------------------------
+# Home Page
+# ---------------------------
 def home(request):
-    """Home page with language switch + search form"""
     if "language" in request.GET:
         response = redirect("home")
         response.set_cookie("django_language", request.GET["language"])
         return response
+
     form = TabletSearchForm()
     return render(request, "tablet_dis/home.html", {"form": form})
 
 
+# ---------------------------
+# Tablet Detail Page
+# ---------------------------
 def tablet_detail(request, name):
-    lang = get_language()  # 'en' or 'ta'
-    if lang == 'en' and is_tamil_text(name):
-        lang = 'ta'
+    lang = get_language()
 
-    # Fetch tablet data (from scraper, returns dict)
-    tablet_data = scrape_tablet_details(name, user_language=lang)
+    # Tamil auto-detection
+    if lang == "en" and is_tamil_text(name):
+        lang = "ta"
 
-    class TabletObj:
-        def __init__(self, data):
-            for k, v in data.items():
-                setattr(self, k, v)
-
-    tablet = TabletObj(tablet_data)
     texts = _ui_texts(lang)
-    display_name = tablet_data.get("name_ta") if lang == "ta" and tablet_data.get("name_ta") else tablet_data.get("name_en", name)
 
-    context = {
-        "tablet": tablet,
-        "texts": texts,
-        "display_name": display_name,
-    }
-    return render(request, "tablet_dis/tablet_detail.html", context)
+    # 1️⃣ Try DB first (MODEL)
+    tablet = get_tablet_from_db(name)
+
+    if tablet and hasattr(tablet, "name_en"):
+        display_name = (
+            tablet.name_ta if lang == "ta" and tablet.name_ta else tablet.name_en
+        )
+        return render(
+            request,
+            "tablet_dis/tablet_detail.html",
+            {
+                "tablet": tablet,
+                "texts": texts,
+                "display_name": display_name,
+            },
+        )
+
+    # 2️⃣ API fallback (DICT)
+    api_data = save_tablet_from_api(name, lang)
+
+    if not api_data:
+        return render(
+            request,
+            "tablet_dis/tablet_detail.html",
+            {
+                "tablet": None,
+                "texts": texts,
+                "display_name": name,
+            },
+        )
+
+    # ✅ Convert dict → object (IMPORTANT)
+    class TabletObj:
+        pass
+
+    tablet_obj = TabletObj()
+    for k, v in api_data.items():
+        setattr(tablet_obj, k, v)
+
+    display_name = (
+        tablet_obj.name_ta
+        if lang == "ta" and getattr(tablet_obj, "name_ta", "")
+        else getattr(tablet_obj, "name_en", name)
+    )
+
+    return render(
+        request,
+        "tablet_dis/tablet_detail.html",
+        {
+            "tablet": tablet_obj,
+            "texts": texts,
+            "display_name": display_name,
+        },
+    )
 
 
+
+
+# ---------------------------
+# Autocomplete API
+# ---------------------------
 def autocomplete(request):
-    """Autocomplete suggestions with Tamil detection"""
     query = request.GET.get("q", "").strip()
     lang = get_language()
 
@@ -94,12 +146,14 @@ def autocomplete(request):
     if len(query) < 2:
         return JsonResponse([], safe=False)
 
-    tablets = Tablet.objects.filter(Q(name_en__icontains=query) | Q(name_ta__icontains=query))[:10]
+    tablets = Tablet.objects.filter(
+        Q(name_en__icontains=query) | Q(name_ta__icontains=query)
+    )[:10]
 
     suggestions = []
     for tablet in tablets:
-        suggestion = tablet.name_ta if lang == "ta" and tablet.name_ta else tablet.name_en
-        if suggestion and suggestion not in suggestions:
-            suggestions.append(suggestion)
+        name = tablet.name_ta if lang == "ta" and tablet.name_ta else tablet.name_en
+        if name and name not in suggestions:
+            suggestions.append(name)
 
     return JsonResponse(suggestions, safe=False)
