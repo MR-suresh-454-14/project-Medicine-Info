@@ -56,21 +56,51 @@ TEMPLATES = [
 WSGI_APPLICATION = 'Tablet_Info.wsgi.application'
 
 # Database
-tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
+# If Postgres env vars are provided, use Postgres; otherwise fall back to SQLite for local development.
+DATABASE_URL = os.getenv("DATABASE_URL")
+POSTGRES_NAME = os.getenv('DB_NAME') or os.getenv('PGDATABASE')
+POSTGRES_USER = os.getenv('DB_USER') or os.getenv('PGUSER')
+POSTGRES_PASSWORD = os.getenv('DB_PASSWORD') or os.getenv('PGPASSWORD')
+POSTGRES_HOST = os.getenv('DB_HOST') or os.getenv('PGHOST')
+POSTGRES_PORT = os.getenv('DB_PORT') or os.getenv('PGPORT') or '5432'
+POSTGRES_SSLMODE = os.getenv('DB_SSLLMODE') or os.getenv('PGSSLMODE')
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT', '5432'),
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
+if DATABASE_URL:
+    parsed = urlparse(DATABASE_URL)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': parsed.path.lstrip('/'),
+            'USER': parsed.username,
+            'PASSWORD': parsed.password,
+            'HOST': parsed.hostname,
+            'PORT': parsed.port or '5432',
+            'OPTIONS': {
+                'sslmode': os.getenv('PGSSLMODE', 'require'),
+            },
+        }
     }
-}
+elif POSTGRES_NAME:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': POSTGRES_NAME,
+            'USER': POSTGRES_USER,
+            'PASSWORD': POSTGRES_PASSWORD,
+            'HOST': POSTGRES_HOST,
+            'PORT': POSTGRES_PORT,
+            'OPTIONS': {
+                'sslmode': POSTGRES_SSLMODE or 'require',
+            },
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
 
 
 

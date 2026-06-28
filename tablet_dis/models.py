@@ -33,3 +33,12 @@ class Tablet(models.Model):
         """Return the correct field value depending on the language."""
         field_name = f"{field_base}_{lang}"
         return getattr(self, field_name, None)
+
+    def get_localized(self, field_base, lang="en"):
+        """Prefer the requested language, then fall back to the other."""
+        primary = getattr(self, f"{field_base}_{lang}", None)
+        if primary and str(primary).strip():
+            return primary
+        other = "ta" if lang == "en" else "en"
+        fallback = getattr(self, f"{field_base}_{other}", None)
+        return fallback if fallback and str(fallback).strip() else ""

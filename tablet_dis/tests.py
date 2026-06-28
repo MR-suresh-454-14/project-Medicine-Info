@@ -1,58 +1,84 @@
-import os
-import requests
-import json
+from django.test import SimpleTestCase, TestCase, Client
 
-# Test the API call directly
-api_key = os.getenv('OPENROUTER_API_KEY')
-print(f"API Key found: {api_key is not None}")
+from tablet_dis.tablet_checker import (
+    validate_input_format,
+    normalize_input,
+    INVALID_INPUT,
+)
 
-url = "https://openrouter.ai/api/v1/chat/completions"
 
-headers = {
-    "Authorization": f"Bearer {api_key}",
-    "Content-Type": "application/json",
-    "HTTP-Referer": "http://localhost:8000",
-    "X-Title": "Tablet Information System"
-}
+class TabletCheckerFormatTests(SimpleTestCase):
+    def test_valid_medicine_names(self):
+        valid = [
+            "Paracetamol",
+            "Dolo 650",
+            "Crocin Advance",
+            "Vitamin C",
+            "Amoxicillin 500",
+            "crocin",
+        ]
+        for name in valid:
+            with self.subTest(name=name):
+                result = validate_input_format(name)
+                self.assertTrue(result.ok, msg=f"{name} should be valid")
 
-data = {
-    "model": "openai/gpt-3.5-turbo",
-    "messages": [
-        {
-            "role": "system",
-            "content": "You are a medical information generator. Return ONLY a valid JSON object. No explanations, no code fences, no markdown."
-        },
-        {
-            "role": "user", 
-            "content": 'Provide accurate medical information about "aspirin" as a JSON object with these exact keys: {"name_en": "...", "benefits_en": "...", "side_effects_en": "...", "dosage_en": "...", "age_group_en": "..."}'
-        }
-    ],
-    "temperature": 0.3,
-    "max_tokens": 800
-}
+    def test_reject_empty(self):
+        result = validate_input_format("   ")
+        self.assertFalse(result.ok)
+        self.assertEqual(result.message, INVALID_INPUT)
 
-try:
-    print("Making API call...")
-    response = requests.post(url, headers=headers, json=data, timeout=30)
-    print(f"Status Code: {response.status_code}")
-    
-    if response.status_code == 200:
-        result = response.json()
-        content = result['choices'][0]['message']['content'].strip()
-        print("API Response:")
-        print(content)
-        
-        # Try to parse as JSON
-        try:
-            parsed = json.loads(content)
-            print("✅ JSON parsed successfully!")
-            print("Name:", parsed.get('name_en'))
-            print("Benefits:", parsed.get('benefits_en', '')[:50] + "...")
-        except json.JSONDecodeError:
-            print("❌ Failed to parse JSON")
-    else:
-        print("❌ API call failed")
-        print("Response:", response.text)
-        
-except Exception as e:
-    print(f"❌ Error: {e}")
+    def test_reject_numbers_only(self):
+        for name in ["12345", "9876", "000"]:
+            with self.subTest(name=name):
+                result = validate_input_format(name)
+                self.assertFalse(result.ok)
+
+    def test_reject_keyboard_mash(self):
+        for name in ["asdfgh", "qwerty", "xyzabc"]:
+            with self.subTest(name=name):
+                result = validate_input_format(name)
+                self.assertFalse(result.ok)
+
+    def test_reject_unrelated_words(self):
+        for name in ["Apple", "Bangalore", "India", "Dog", "Suresh", "John"]:
+            with self.subTest(name=name):
+                result = validate_input_format(name)
+                self.assertFalse(result.ok)
+
+    def test_reject_symbols_only(self):
+        result = validate_input_format("@#$%^")
+        self.assertFalse(result.ok)
+
+    def test_normalize_input(self):
+        self.assertEqual(normalize_input("  Dolo   650  "), "dolo 650")
+        self.assertEqual(normalize_input("Paracetamol"), "paracetamol")
+
+
+class TabletCheckerViewTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+    def test_invalid_input_page(self):
+        response = self.client.get("/en/tablet/asdfgh/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, INVALID_INPUT)
+
+    def test_invalid_numbers_page(self):
+        response = self.client.get("/en/tablet/123456/")
+        self.assertContains(response, INVALID_INPUT)
+
+    def test_valid_medicine_page(self):
+        response = self.client.get("/en/tablet/Paracetamol/")
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, INVALID_INPUT)
+
+    def test_validate_search_api(self):
+        response = self.client.get("/en/validate-search/?q=qwerty")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertFalse(data["ok"])
+        self.assertEqual(data["message"], INVALID_INPUT)
+
+        response = self.client.get("/en/validate-search/?q=Paracetamol")
+        data = response.json()
+        self.assertTrue(data["ok"])

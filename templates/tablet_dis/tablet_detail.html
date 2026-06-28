@@ -1,5 +1,5 @@
 {% extends 'tablet_dis/base.html' %}
-{% load i18n %}
+{% load i18n tablet_extras %}
 
 {% block title %}{{ display_name }}{% endblock title %}
 
@@ -14,27 +14,17 @@
   </section>
 
   <!-- Benefits & Side Effects Overview -->
-  {% get_current_language as LANGUAGE_CODE %}
   <div class="grid-2 spacer-lg">
     <div>
       <h5 style="color: #16a34a; margin-bottom: 12px;">{{ texts.label_benefits }}</h5>
       <ul style="list-style:none; padding:0; margin:0;">
-        {% if LANGUAGE_CODE == "ta" %}
-          {% if tablet.advantages_ta %}
-            {% for line in tablet.advantages_ta.splitlines %}
-              {% if line.strip %}<li>✔️ {{ line }}</li>{% endif %}
-            {% endfor %}
-          {% else %}
-            <li>✔️ {{ texts.not_available }}</li>
-          {% endif %}
+        {% tablet_field tablet "advantages" lang as advantages %}
+        {% if advantages %}
+          {% for line in advantages.splitlines %}
+            {% if line.strip %}<li>✔️ {{ line }}</li>{% endif %}
+          {% endfor %}
         {% else %}
-          {% if tablet.advantages_en %}
-            {% for line in tablet.advantages_en.splitlines %}
-              {% if line.strip %}<li>✔️ {{ line }}</li>{% endif %}
-            {% endfor %}
-          {% else %}
-            <li>✔️ {{ texts.not_available }}</li>
-          {% endif %}
+          <li>✔️ {{ texts.not_available }}</li>
         {% endif %}
       </ul>
     </div>
@@ -42,22 +32,13 @@
     <div>
       <h5 style="color: #dc2626; margin-bottom: 12px;">{{ texts.label_side_effects }}</h5>
       <ul style="list-style:none; padding:0; margin:0;">
-        {% if LANGUAGE_CODE == "ta" %}
-          {% if tablet.disadvantages_ta %}
-            {% for line in tablet.disadvantages_ta.splitlines %}
-              {% if line.strip %}<li>⚠️ {{ line }}</li>{% endif %}
-            {% endfor %}
-          {% else %}
-            <li>⚠️ {{ texts.not_available }}</li>
-          {% endif %}
+        {% tablet_field tablet "disadvantages" lang as disadvantages %}
+        {% if disadvantages %}
+          {% for line in disadvantages.splitlines %}
+            {% if line.strip %}<li>⚠️ {{ line }}</li>{% endif %}
+          {% endfor %}
         {% else %}
-          {% if tablet.disadvantages_en %}
-            {% for line in tablet.disadvantages_en.splitlines %}
-              {% if line.strip %}<li>⚠️ {{ line }}</li>{% endif %}
-            {% endfor %}
-          {% else %}
-            <li>⚠️ {{ texts.not_available }}</li>
-          {% endif %}
+          <li>⚠️ {{ texts.not_available }}</li>
         {% endif %}
       </ul>
     </div>
@@ -67,47 +48,32 @@
   <div class="spacer-lg">
     <div class="card-zen" style="padding: 24px;">
         <h5 style="color: var(--color-primary); margin-bottom: 12px;">{{ texts.label_dosage }}</h5>
-        {% if LANGUAGE_CODE == "ta" %}
-          {% if tablet.dosage_timing_ta %}
-            {% for line in tablet.dosage_timing_ta.splitlines %}
-              {% if line.strip %}<div>{{ line }}</div>{% endif %}
-            {% endfor %}
-          {% else %}
-            <p>{{ texts.not_available }}</p>
-          {% endif %}
+        {% tablet_field tablet "dosage_timing" lang as dosage_timing %}
+        {% if dosage_timing %}
+          {% for line in dosage_timing.splitlines %}
+            {% if line.strip %}<div>{{ line }}</div>{% endif %}
+          {% endfor %}
         {% else %}
-          {% if tablet.dosage_timing_en %}
-            {% for line in tablet.dosage_timing_en.splitlines %}
-              {% if line.strip %}<div>{{ line }}</div>{% endif %}
-            {% endfor %}
-          {% else %}
-            <p>{{ texts.not_available }}</p>
-          {% endif %}
+          <p>{{ texts.not_available }}</p>
         {% endif %}
       </div>
     </div>
-  </div>
+
 
   <!-- Age Group & Storage -->
   <div class="grid-2 spacer-lg">
     <div>
       <div class="card-zen" style="padding: 24px; height: 100%;">
         <h5 style="color: #0891b2; margin-bottom: 12px;">{{ texts.label_age_group }}</h5>
-        {% if LANGUAGE_CODE == "ta" %}
-          <p>{{ tablet.age_group_ta|default:texts.not_available }}</p>
-        {% else %}
-          <p>{{ tablet.age_group_en|default:texts.not_available }}</p>
-        {% endif %}
+        {% tablet_field tablet "age_group" lang as age_group %}
+        <p>{{ age_group|default:texts.not_available }}</p>
       </div>
     </div>
     <div>
       <div class="card-zen" style="padding: 24px; height: 100%;">
         <h5 style="color: #64748B; margin-bottom: 12px;">{{ texts.label_storage }}</h5>
-        {% if LANGUAGE_CODE == "ta" %}
-          <p>{{ tablet.storage_ta|default:texts.not_available }}</p>
-        {% else %}
-          <p>{{ tablet.storage_en|default:texts.not_available }}</p>
-        {% endif %}
+        {% tablet_field tablet "storage" lang as storage %}
+        <p>{{ storage|default:texts.not_available }}</p>
       </div>
     </div>
   </div>
@@ -117,22 +83,13 @@
     <div class="card-zen" style="padding: 24px;">
       <h5 style="margin-bottom:12px;">{{ texts.label_interactions }}</h5>
               <ul style="list-style:none; padding:0; margin:0;">
-                {% if LANGUAGE_CODE == "ta" %}
-                  {% if tablet.interactions_ta %}
-                    {% for line in tablet.interactions_ta.splitlines %}
-                      {% if line.strip %}<li>🔗 {{ line }}</li>{% endif %}
-                    {% endfor %}
-                  {% else %}
-                    <li>🔗 {{ texts.not_available }}</li>
-                  {% endif %}
+                {% tablet_field tablet "interactions" lang as interactions %}
+                {% if interactions %}
+                  {% for line in interactions.splitlines %}
+                    {% if line.strip %}<li>🔗 {{ line }}</li>{% endif %}
+                  {% endfor %}
                 {% else %}
-                  {% if tablet.interactions_en %}
-                    {% for line in tablet.interactions_en.splitlines %}
-                      {% if line.strip %}<li>🔗 {{ line }}</li>{% endif %}
-                    {% endfor %}
-                  {% else %}
-                    <li>🔗 {{ texts.not_available }}</li>
-                  {% endif %}
+                  <li>🔗 {{ texts.not_available }}</li>
                 {% endif %}
               </ul>
     </div>

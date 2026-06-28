@@ -7,7 +7,7 @@ import requests
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
-API_KEY = os.getenv("OPENROUTER_API_KEY")
+API_KEY = os.getenv("OPENROUTER_API_KEY") or os.getenv("API_KEY")
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 def build_messages(tablet_name, user_language):
@@ -177,4 +177,4 @@ def scrape_tablet_details(tablet_name, user_language="en"):
     api_response = call_models_for_json(messages)
     if api_response:
         return rename_api_keys(api_response)
-    return fallback_data(tablet_name, user_language)
+    return None

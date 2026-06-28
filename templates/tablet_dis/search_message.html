@@ -1,0 +1,28 @@
+{% extends 'tablet_dis/base.html' %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock title %}
+
+{% block content %}
+<section class="hero-bg hero">
+  <div class="container" style="text-align:center;">
+    <h1 style="margin:0;">💊 {% trans "Medicine Information" %}</h1>
+  </div>
+</section>
+
+<div class="container spacer-lg" style="max-width: 720px;">
+  <div class="card-zen" style="padding: 32px; text-align: center;">
+    <p style="font-size: 1.1rem; color: var(--color-ink); margin-bottom: 24px;">
+      {{ message }}
+    </p>
+    {% if query %}
+      <p style="color: var(--color-subtle); margin-bottom: 24px;">
+        <strong>{% trans "You searched for" %}:</strong> {{ query }}
+      </p>
+    {% endif %}
+    <a href="{% url 'home' %}" class="btn-zen btn-zen-primary">
+      ⬅️ {% trans "Back to Search" %}
+    </a>
+  </div>
+</div>
+{% endblock content %}

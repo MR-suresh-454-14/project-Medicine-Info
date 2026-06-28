@@ -1,6 +1,9 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
+from tablet_dis.tablet_checker import validate_input_format, INVALID_INPUT
+
+
 class TabletSearchForm(forms.Form):
     query = forms.CharField(
         label=_('Search Tablet'),
@@ -20,6 +23,7 @@ class TabletSearchForm(forms.Form):
 
     def clean_query(self):
         query = self.cleaned_data.get('query', '').strip()
-        if not query:
-            raise forms.ValidationError(_('Please enter a tablet name.'))
-        return query.title()  # Capitalize first letter of each word
+        result = validate_input_format(query)
+        if not result.ok:
+            raise forms.ValidationError(_(result.message or INVALID_INPUT))
+        return result.normalized

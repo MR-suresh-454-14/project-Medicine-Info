@@ -26,6 +26,7 @@
         <button class="btn-zen btn-zen-primary" style="width:100%; margin-top:12px;" type="submit">
           🔍 {% trans "Get  Medicine Info" %}
         </button>
+        <div id="searchError" class="text-danger text-center mt-3" style="display:none;"></div>
       </form>
   {% if results %}
     <div class="card-zen spacer-lg" style="padding: 24px;">
@@ -79,14 +80,33 @@
 
 {% block extra_scripts %}
 <script>
-function redirectToTablet(event) {
+async function redirectToTablet(event) {
   event.preventDefault();
   const queryInput = document.querySelector('input[name="query"]');
+  const errorBox = document.getElementById('searchError');
   const query = queryInput.value.trim();
-  if (query.length > 0) {
-    // Get current language from HTML lang attribute
+  errorBox.style.display = 'none';
+
+  if (!query.length) {
+    errorBox.textContent = 'Invalid input.';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  try {
     const lang = document.documentElement.lang || 'en';
+    const response = await fetch(`/${lang}/validate-search/?q=${encodeURIComponent(query)}`);
+    const data = await response.json();
+    if (!data.ok) {
+      errorBox.textContent = data.message || 'Invalid input.';
+      errorBox.style.display = 'block';
+      return;
+    }
     window.location.href = `/${lang}/tablet/${encodeURIComponent(query)}/`;
+  } catch (error) {
+    console.error('Search validation failed:', error);
+    errorBox.textContent = 'Something went wrong. Please try again.';
+    errorBox.style.display = 'block';
   }
 }
 

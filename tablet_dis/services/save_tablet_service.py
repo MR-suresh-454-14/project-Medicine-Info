@@ -43,10 +43,38 @@ def save_tablet_from_api(tablet_name, user_language="en"):
             }
         )
 
-        # 🔹 If already exists but Tamil name missing → update
-        if not created and name_ta and not tablet.name_ta:
-            tablet.name_ta = name_ta
-            tablet.save(update_fields=["name_ta"])
+        # 🔹 If record already exists, update any missing fields from API
+        if not created:
+            updated_fields = []
+            # Ensure Tamil name is set
+            if name_ta and not tablet.name_ta:
+                tablet.name_ta = name_ta
+                updated_fields.append("name_ta")
+
+            # Update other blank fields from api_data
+            field_names = [
+                "advantages_en",
+                "advantages_ta",
+                "disadvantages_en",
+                "disadvantages_ta",
+                "dosage_timing_en",
+                "dosage_timing_ta",
+                "age_group_en",
+                "age_group_ta",
+                "storage_en",
+                "storage_ta",
+                "interactions_en",
+                "interactions_ta",
+            ]
+
+            for fn in field_names:
+                api_val = api_data.get(fn, "")
+                if api_val and not getattr(tablet, fn, None):
+                    setattr(tablet, fn, api_val)
+                    updated_fields.append(fn)
+
+            if updated_fields:
+                tablet.save(update_fields=updated_fields)
 
         # 🔹 Return data for UI (not model)
         return api_data

@@ -6,12 +6,21 @@ from django.db.models import Q
 
 def get_tablet_from_db(name):
     """
-    Fetch tablet data from DB using partial match (safe & flexible)
+    Fetch tablet data from DB. Exact name match first, then partial match.
     """
+    name = (name or "").strip()
+    if not name:
+        return None
+
+    exact = Tablet.objects.filter(
+        Q(name_en__iexact=name) | Q(name_ta__iexact=name)
+    ).first()
+    if exact:
+        return exact
+
     return (
         Tablet.objects.filter(
-            Q(name_en__icontains=name) |
-            Q(name_ta__icontains=name)
+            Q(name_en__icontains=name) | Q(name_ta__icontains=name)
         )
         .order_by("id")
         .first()
