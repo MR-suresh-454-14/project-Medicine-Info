@@ -9,7 +9,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Security Settings
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key-for-development')
-DEBUG = os.getenv('DEBUG', 'True').lower() in ['true', '1', 'yes']
+DEBUG = DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '*']
 
 # Application definition
@@ -65,6 +65,10 @@ POSTGRES_PASSWORD = os.getenv('DB_PASSWORD') or os.getenv('PGPASSWORD')
 POSTGRES_HOST = os.getenv('DB_HOST') or os.getenv('PGHOST')
 POSTGRES_PORT = os.getenv('DB_PORT') or os.getenv('PGPORT') or '5432'
 POSTGRES_SSLMODE = os.getenv('DB_SSLLMODE') or os.getenv('PGSSLMODE')
+
+
+
+DATABASE_URL = os.getenv("DATABASE_URL") or os.getenv("PGURL")
 
 if DATABASE_URL:
     parsed = urlparse(DATABASE_URL)

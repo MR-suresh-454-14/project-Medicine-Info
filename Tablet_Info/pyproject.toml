@@ -1,0 +1,17 @@
+
+[project]
+name = "project-medicine-info"
+version = "0.1.0"
+description = "Tablet Information Management System"
+requires-python = ">=3.12"
+
+dependencies = [
+    "Django==6.0.6",
+    "psycopg[binary]",
+    "python-dotenv",
+]
+
+[dependency-groups]
+dev = [
+    "ruff",
+]
