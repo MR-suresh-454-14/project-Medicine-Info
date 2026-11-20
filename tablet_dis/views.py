@@ -1,6 +1,7 @@
+from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
-from django.utils.translation import get_language
+from django.utils.translation import get_language, gettext as _
 from django.db.models import Q
 
 from tablet_dis.models import Tablet
@@ -119,7 +120,15 @@ def home(request):
         response.set_cookie("django_language", request.GET["language"])
         return response
 
-    form = TabletSearchForm()
+    form = TabletSearchForm(request.POST or None)
+    if request.method == "POST":
+        if form.is_valid():
+            return redirect("tablet_detail", name=form.cleaned_data["name"])
+        messages.error(
+            request,
+            _("Invalid input. Please enter a valid tablet name only."),
+        )
+
     return render(request, "tablet_dis/home.html", {"form": form})
 
 

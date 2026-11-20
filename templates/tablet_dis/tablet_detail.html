@@ -58,42 +58,64 @@
         {% endif %}
       </div>
     </div>
+  <!-- Age Group & Storage Instructions -->
+<div class="grid-2 spacer-lg">
 
-
-  <!-- Age Group & Storage -->
-  <div class="grid-2 spacer-lg">
+    <!-- Age Group Card -->
     <div>
-      <div class="card-zen" style="padding: 24px; height: 100%;">
-        <h5 style="color: #0891b2; margin-bottom: 12px;">{{ texts.label_age_group }}</h5>
-        {% tablet_field tablet "age_group" lang as age_group %}
-        <p>{{ age_group|default:texts.not_available }}</p>
-      </div>
-    </div>
-    <div>
-      <div class="card-zen" style="padding: 24px; height: 100%;">
-        <h5 style="color: #64748B; margin-bottom: 12px;">{{ texts.label_storage }}</h5>
-        {% tablet_field tablet "storage" lang as storage %}
-        <p>{{ storage|default:texts.not_available }}</p>
-      </div>
-    </div>
-  </div>
+        <div class="card-zen" style="padding: 24px; height: 100%;">
+            <h5 style="color: #0891b2; margin-bottom: 12px;">
+                {{ texts.label_age_group }}
+            </h5>
 
-  <!-- Drug Interactions Accordion -->
-  <div class="spacer-lg">
+            {% tablet_field tablet "age_group" lang as age_group %}
+
+            <p>{{ age_group|default:texts.not_available }}</p>
+        </div>
+    </div>
+
+    <!-- Storage Instructions Card -->
+    <div>
+        <div class="card-zen" style="padding: 24px; height: 100%;">
+            <h5 style="color: #64748B; margin-bottom: 12px;">
+                {{ texts.label_storage }}
+            </h5>
+
+            {% tablet_field tablet "storage" lang as storage %}
+
+            <p>{{ storage|default:texts.not_available }}</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Drug Interactions Card -->
+<div class="spacer-lg">
     <div class="card-zen" style="padding: 24px;">
-      <h5 style="margin-bottom:12px;">{{ texts.label_interactions }}</h5>
-              <ul style="list-style:none; padding:0; margin:0;">
-                {% tablet_field tablet "interactions" lang as interactions %}
-                {% if interactions %}
-                  {% for line in interactions.splitlines %}
-                    {% if line.strip %}<li>🔗 {{ line }}</li>{% endif %}
-                  {% endfor %}
-                {% else %}
-                  <li>🔗 {{ texts.not_available }}</li>
-                {% endif %}
-              </ul>
+
+        <h5 style="margin-bottom: 12px;">
+            {{ texts.label_interactions }}
+        </h5>
+
+        <ul style="list-style: none; padding: 0; margin: 0;">
+
+            {% tablet_field tablet "interactions" lang as interactions %}
+
+            {% if interactions %}
+                {% for line in interactions.splitlines %}
+                    {% if line.strip %}
+                        <li>🔗 {{ line }}</li>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <li>🔗 {{ texts.not_available }}</li>
+            {% endif %}
+
+        </ul>
+
     </div>
-  </div>
+</div>
+
 
   <!-- Doctor Disclaimer -->
   <div class="disclaimer" style="text-align:center; margin-top: 24px;">{{ texts.disclaimer }}</div>

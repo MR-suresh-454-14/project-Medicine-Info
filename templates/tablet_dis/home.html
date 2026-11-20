@@ -11,63 +11,58 @@
       <p style="color: var(--color-subtle); margin-top:8px;">{% trans "Get clear and simple information about medicines" %}</p>
     </div>
   </div>
-  
-  
 </section>
+
 <div class="container spacer-lg" style="max-width: 720px;">
-<div class="container spacer-lg" style="max-width: 720px;">
-    <div class="card-zen" style="padding: 24px;">
-      <h4 class="text-center mb-4">{% trans "Search for a Tablet" %}</h4>
-      <form id="searchForm" onsubmit="redirectToTablet(event)">
-        <div class="autocomplete-container">
-          {{ form.query }}
-          <div id="suggestionsBox" class="suggestions-box" style="display: none;"></div>
-        </div>
-        <button class="btn-zen btn-zen-primary" style="width:100%; margin-top:12px;" type="submit">
-          🔍 {% trans "Get  Medicine Info" %}
-        </button>
-        <div id="searchError" class="text-danger text-center mt-3" style="display:none;"></div>
-      </form>
-  {% if results %}
-    <div class="card-zen spacer-lg" style="padding: 24px;">
-      <h4 class="mb-3 text-center">
-        {% if LANGUAGE_CODE == "ta" %}
-          🔍 தேடல் முடிவுகள்
-        {% else %}
-          🔍 Search Results
-        {% endif %}
-      </h4>
-      <ul class="list-group">
-        {% for tablet in results %}
-          <li class="list-group-item">
-           {% if LANGUAGE_CODE == "ta" %}
-  <a href="{% url 'tablet_detail' tablet.name_ta %}">
-    {{ tablet.name_ta|default:"தகவல் இல்லை" }}
-  </a>
-{% else %}
-  <a href="{% url 'tablet_detail' tablet.name_en %}">
-    {{ tablet.name_en|default:"Information not available" }}
-  </a>
-{% endif %}
+  <div class="card-zen" style="padding: 24px;">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} slide-alert">
+        {{ message }}
+      </div>
+    {% endfor %}
 
-           {% if LANGUAGE_CODE == "ta" %}
-             {{ tablet.name_ta|default:"தகவல் இல்லை" }}
-           {% else %}
-             {{ tablet.name_en|default:"Information not available" }}
-           {% endif %}
-            </a>
+    <h4 class="text-center mb-4">{% trans "Search for a Tablet" %}</h4>
+    <form id="searchForm" method="post" action="">
+      {% csrf_token %}
+      <div class="autocomplete-container">
+        {{ form.name.as_widget }}
+        <div id="suggestionsBox" class="suggestions-box" style="display: none;"></div>
+      </div>
+      <button class="btn-zen btn-zen-primary" style="width:100%; margin-top:12px;" type="submit">
+        🔍 {% trans "Get  Medicine Info" %}
+      </button>
+    </form>
 
-            
-          </li>
-        {% endfor %}
-      </ul>
-    </div>
-{% endif %}
+    {% if results %}
+      <div class="card-zen spacer-lg" style="padding: 24px;">
+        <h4 class="mb-3 text-center">
+          {% if LANGUAGE_CODE == "ta" %}
+            🔍 தேடல் முடிவுகள்
+          {% else %}
+            🔍 Search Results
+          {% endif %}
+        </h4>
+        <ul class="list-group">
+          {% for tablet in results %}
+            <li class="list-group-item">
+              {% if LANGUAGE_CODE == "ta" %}
+                <a href="{% url 'tablet_detail' tablet.name_ta %}">
+                  {{ tablet.name_ta|default:"தகவல் இல்லை" }}
+                </a>
+              {% else %}
+                <a href="{% url 'tablet_detail' tablet.name_en %}">
+                  {{ tablet.name_en|default:"Information not available" }}
+                </a>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
 
-      <small class="text-muted d-block text-center mt-3">
-        {% trans "Start typing to see suggestions..." %}
-      </small>
-    </div>
+    <small class="text-muted d-block text-center mt-3">
+      {% trans "Start typing to see suggestions..." %}
+    </small>
   </div>
 </div>
 
@@ -80,37 +75,19 @@
 
 {% block extra_scripts %}
 <script>
-async function redirectToTablet(event) {
-  event.preventDefault();
-  const queryInput = document.querySelector('input[name="query"]');
-  const errorBox = document.getElementById('searchError');
-  const query = queryInput.value.trim();
-  errorBox.style.display = 'none';
+setTimeout(function () {
+    let alerts = document.querySelectorAll(".slide-alert");
 
-  if (!query.length) {
-    errorBox.textContent = 'Invalid input.';
-    errorBox.style.display = 'block';
-    return;
-  }
+    alerts.forEach(alert => {
+        alert.classList.add("slide-out");
 
-  try {
-    const lang = document.documentElement.lang || 'en';
-    const response = await fetch(`/${lang}/validate-search/?q=${encodeURIComponent(query)}`);
-    const data = await response.json();
-    if (!data.ok) {
-      errorBox.textContent = data.message || 'Invalid input.';
-      errorBox.style.display = 'block';
-      return;
-    }
-    window.location.href = `/${lang}/tablet/${encodeURIComponent(query)}/`;
-  } catch (error) {
-    console.error('Search validation failed:', error);
-    errorBox.textContent = 'Something went wrong. Please try again.';
-    errorBox.style.display = 'block';
-  }
-}
+        setTimeout(() => {
+            alert.remove();
+        }, 600);
+    });
+}, 5000);
 
-const input = document.querySelector('input[name="query"]');
+const input = document.querySelector('input[name="name"]');
 const suggestionsBox = document.getElementById('suggestionsBox');
 let debounceTimer;
 

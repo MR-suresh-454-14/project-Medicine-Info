@@ -1,3 +1,4 @@
+from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 
 class Tablet(models.Model):
@@ -25,6 +26,21 @@ class Tablet(models.Model):
     # Timestamp fields
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+    class Meta:
+        indexes = [
+            GinIndex(
+                name="tablet_name_en_trgm_idx",
+                fields=["name_en"],
+                opclasses=["gin_trgm_ops"],
+            ),
+            GinIndex(
+                name="tablet_name_ta_trgm_idx",
+                fields=["name_ta"],
+                opclasses=["gin_trgm_ops"],
+            ),
+        ]
 
     def __str__(self):
         return self.name_en or self.name_ta or "Unnamed Tablet"

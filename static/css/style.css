@@ -30,57 +30,43 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Layout primitives */
-.container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 16px;
+/* Age Group and Storage layout */
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    align-items: stretch;
 }
 
-.spacer-xl { margin-top: 48px; margin-bottom: 24px; }
-.spacer-lg { margin-top: 32px; margin-bottom: 16px; }
-.spacer-md { margin-top: 20px; margin-bottom: 12px; }
+/* Prevent grid children from overflowing */
+.grid-2 > div {
+    min-width: 0;
+}
 
-/* Navbar */
-.navbar-zen {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: var(--color-primary);
-    box-shadow: 0 4px 16px rgba(43,140,255,0.25);
-}
-.navbar-zen .bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 64px;
-}
-.nav-brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    color: #fff;
-    font-weight: 700;
-    text-decoration: none;
-    letter-spacing: 0.3px;
-}
-.nav-links { display: flex; align-items: center; gap: 10px; }
-.lang-pill {
-    display: inline-flex;
-    align-items: center;
-    padding: 6px 10px;
-    border-radius: 999px;
-    color: var(--color-ink);
-    background: #fff;
-    text-decoration: none;
-    font-weight: 600;
-}
-.lang-pill.is-active { background: var(--color-accent); }
+/* Keep cards inside their containers */
+.card-zen {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    margin-bottom: 20px;
 
-/* Grid */
-.grid-2 { display: grid; grid-template-columns: 1fr; gap: 16px; }
-@media (min-width: 768px) {
-    .grid-2 { grid-template-columns: 1fr 1fr; gap: 24px; }
+}
+
+/* Drug Interactions section */
+.spacer-lg {
+    display: block;
+    width: 100%;
+    clear: both;
+    margin-top: 32px;
+    margin-bottom: 16px;
+}
+
+/* Responsive layout for mobile */
+@media (max-width: 767px) {
+    .grid-2 {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
 }
 
 .app-surface {
@@ -177,20 +163,36 @@ body {
     box-shadow: 0 0 0 4px rgba(110, 193, 255, 0.25);
 }
 
-/* Ensure search field adopts zen input without template filters */
-.autocomplete-container input[name="query"] {
+
+/* Autocomplete parent container */
+.autocomplete-container {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+/* Search input */
+.autocomplete-container input[name="name"] {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+
     background: #fff;
     border: 1px solid rgba(2, 6, 23, 0.08);
-    border-radius: 999px; /* pill */
+    border-radius: 999px;
     padding: 12px 16px;
     color: var(--color-ink);
-    width: 100%;
 }
-.autocomplete-container input[name="query"]:focus {
+
+/* Search input focus */
+.autocomplete-container input[name="name"]:focus {
     outline: none;
     border-color: var(--color-primary-200);
     box-shadow: 0 0 0 4px rgba(110, 193, 255, 0.25);
 }
+
 
 /* Disclaimer */
 .disclaimer {
@@ -216,5 +218,56 @@ body {
         border-right: none !important;
         border-bottom: 1px solid #f0f0f0;
         margin-bottom: 8px;
+    }
+}
+
+/* Global alerts (messages framework) */
+.alert {
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-align: center;
+}
+.alert-success {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+.alert-error {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.slide-alert {
+    position: relative;
+    animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.slide-out {
+    animation: slideOut 0.6s ease-in forwards;
+}
+
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-150px);
     }
 }
