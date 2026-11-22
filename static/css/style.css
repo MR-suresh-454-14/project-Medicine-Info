@@ -1,4 +1,4 @@
-/* Gen‑Z theme variables and utilities */
+/* Gen-Z theme variables and utilities */
 :root {
     --color-bg: #F8FAFC;
     --color-surface: #FFFFFF;
@@ -23,11 +23,57 @@
     --shadow-hover: 0 12px 32px rgba(15, 23, 42, 0.10);
 }
 
+/* Padding no longer makes inputs/cards overflow their container */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 body {
-    background: var(--color-bg);
+    /* soft glow in the corners, same color palette */
+    background:
+        radial-gradient(circle at 10% 0%, var(--color-primary-50) 0%, transparent 40%),
+        radial-gradient(circle at 90% 100%, var(--color-accent-50) 0%, transparent 40%),
+        var(--color-bg);
+    background-attachment: fixed;
     color: var(--color-ink);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===================== LAYOUT ===================== */
+
+.container {
+    width: 100%;
+    max-width: 1100px;
+    margin-inline: auto;
+    padding-inline: 16px;
+}
+/* Templates nest .container inside <main class="container">: avoid double padding */
+.container .container {
+    padding-inline: 0;
+}
+
+.spacer-md {
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.spacer-lg {
+    display: block;
+    width: 100%;
+    clear: both;
+    margin-top: 32px;
+    margin-bottom: 16px;
+}
+
+.spacer-xl {
+    padding-top: 24px;
+    padding-bottom: 24px;
+}
+/* nested spacer-xl adds no extra space */
+.container .spacer-xl {
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 /* Age Group and Storage layout */
@@ -43,24 +89,6 @@ body {
     min-width: 0;
 }
 
-/* Keep cards inside their containers */
-.card-zen {
-    box-sizing: border-box;
-    width: 100%;
-    min-width: 0;
-    margin-bottom: 20px;
-
-}
-
-/* Drug Interactions section */
-.spacer-lg {
-    display: block;
-    width: 100%;
-    clear: both;
-    margin-top: 32px;
-    margin-bottom: 16px;
-}
-
 /* Responsive layout for mobile */
 @media (max-width: 767px) {
     .grid-2 {
@@ -69,103 +97,207 @@ body {
     }
 }
 
-.app-surface {
+/* ===================== NAVBAR ===================== */
+
+.navbar-zen {
     background: var(--color-surface);
-    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-soft);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
-.hero-bg {
-    background: linear-gradient(135deg, var(--color-primary-50), var(--color-accent-50));
+.navbar-zen .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
 }
 
-.hero {
-    padding: 50px 0; /* tighter like preview */
-    border-radius: 16px;
+.nav-brand {
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: var(--color-ink);
+    text-decoration: none;
 }
+
+.nav-links {
+    display: flex;
+    gap: 8px;
+}
+
+.lang-pill {
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--color-primary-200);
+    color: var(--color-primary-700);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.lang-pill.is-active {
+    background: var(--color-primary-700);
+    border-color: var(--color-primary-700);
+    color: #fff;
+}
+
+/* ===================== CARDS & SURFACES ===================== */
 
 .card-zen {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    margin-bottom: 20px;
+
     background: var(--color-surface);
     border: 1px solid rgba(2, 6, 23, 0.05);
     border-radius: 20px;
     box-shadow: var(--shadow-soft);
 }
 
-/* Wide, flat search section */
-.search-section { padding: 0; }
+/* Cards inside the grid use height:100%, so remove the extra margin */
+.grid-2 .card-zen {
+    margin-bottom: 0;
+}
+
+.app-surface {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+}
+
+/* Hero banner (darker gradient: -200 shades) */
+.hero-bg {
+    background: linear-gradient(135deg, var(--color-primary-200), var(--color-accent-200));
+    position: relative;
+    overflow: hidden;
+}
+
+.hero {
+    padding: 50px 0;
+    border-radius: 16px;
+}
+
+/* Soft glowing circles behind the hero title */
+.hero::before,
+.hero::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.55;
+    pointer-events: none;
+}
+.hero::before {
+    width: 220px;
+    height: 220px;
+    top: -70px;
+    left: -50px;
+    background: var(--color-accent-200);
+}
+.hero::after {
+    width: 260px;
+    height: 260px;
+    bottom: -100px;
+    right: -60px;
+    background: var(--color-primary-200);
+}
+.hero > .container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Big title overflowed on small screens */
+@media (max-width: 767px) {
+    .hero h1 {
+        font-size: 2rem !important;
+    }
+}
+
+/* Search card (home and not-found pages): accent bar, fade-in, more space */
+.container.spacer-lg > .card-zen {
+    position: relative;
+    padding: 36px 32px 28px !important; /* !important because the template has inline padding */
+    animation: fadeUp 0.5s ease both;
+    transition: box-shadow 0.25s ease;
+}
+.container.spacer-lg > .card-zen::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 32px;
+    right: 32px;
+    height: 4px;
+    border-radius: 0 0 8px 8px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+}
+.container.spacer-lg > .card-zen:hover,
+.container.spacer-lg > .card-zen:focus-within {
+    box-shadow: var(--shadow-hover);
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 767px) {
+    .container.spacer-lg > .card-zen {
+        padding: 28px 20px 22px !important;
+    }
+    .container.spacer-lg > .card-zen::before {
+        left: 20px;
+        right: 20px;
+    }
+}
+
+/* Card title with small gradient underline */
+.card-zen > h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-ink);
+}
+.card-zen > h4::after {
+    content: "";
+    display: block;
+    width: 48px;
+    height: 4px;
+    margin: 10px auto 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+}
+
+/* Hint text under the button */
+.card-zen > small.text-muted {
+    margin-top: 18px;
+    font-size: 0.85rem;
+}
+
+/* ===================== SEARCH ===================== */
+
+.search-section {
+    padding: 0;
+}
+
 .search-row {
     display: flex;
     align-items: stretch;
     gap: 10px;
 }
-.search-row .autocomplete-container { margin: 0; }
+
+.search-row .autocomplete-container {
+    margin: 0;
+}
+
 .search-row .search-btn {
     height: 44px;
     padding-inline: 18px;
     white-space: nowrap;
 }
 
-.btn-zen {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    border: 0;
-    padding: 12px 16px;
-    height: 44px; /* consistent button height */
-    border-radius: 999px; /* pill shape like preview */
-    cursor: pointer;
-    transition: transform .15s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.btn-zen-primary {
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-700) 100%);
-    color: #fff;
-    box-shadow: 0 6px 18px rgba(110, 193, 255, 0.35);
-}
-.btn-zen-primary:hover {
-    background: var(--color-primary-700);
-    transform: translateY(-1px);
-    box-shadow: 0 10px 28px rgba(43, 140, 255, 0.35);
-}
-
-.btn-zen-accent {
-    background: var(--color-accent);
-    color: var(--color-ink);
-    box-shadow: 0 6px 18px rgba(255, 179, 214, 0.45);
-}
-.btn-zen-accent:hover {
-    background: var(--color-accent-700);
-    color: #fff;
-}
-
-.link-zen {
-    color: var(--color-primary);
-    text-decoration: none;
-}
-.link-zen:hover {
-    color: var(--color-accent-700);
-    text-decoration: underline;
-}
-
-.input-zen, input[type="text"], input[type="search"], input[type="email"], input[type="number"], select, textarea {
-    background: #fff;
-    border: 1px solid rgba(2, 6, 23, 0.08);
-    border-radius: var(--radius-sm);
-    padding: 10px 12px;
-    color: var(--color-ink);
-}
-.input-zen:focus, input:focus, select:focus, textarea:focus {
-    outline: none;
-    border-color: var(--color-primary-200);
-    box-shadow: 0 0 0 4px rgba(110, 193, 255, 0.25);
-}
-
-
 /* Autocomplete parent container */
 .autocomplete-container {
+    position: relative; /* needed so the dropdown sits under the input */
     width: 100%;
     max-width: 100%;
     min-width: 0;
@@ -193,8 +325,189 @@ body {
     box-shadow: 0 0 0 4px rgba(110, 193, 255, 0.25);
 }
 
+/* Search input (home page form): bigger, softer, nicer focus */
+#searchForm .autocomplete-container input[name="name"] {
+    padding: 15px 22px;
+    font-size: 1rem;
+    border: 1.5px solid var(--color-primary-200);
+    box-shadow: 0 4px 14px rgba(110, 193, 255, 0.15);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+#searchForm .autocomplete-container input[name="name"]::placeholder {
+    color: var(--color-subtle);
+    opacity: 0.8;
+}
+#searchForm .autocomplete-container input[name="name"]:focus {
+    border-color: var(--color-primary-700);
+    box-shadow: 0 0 0 4px rgba(110, 193, 255, 0.25),
+                0 8px 20px rgba(43, 140, 255, 0.15);
+}
 
-/* Disclaimer */
+/* Suggestions dropdown */
+.suggestions-box {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    margin-top: 6px;
+    max-height: 260px;
+    overflow-y: auto;
+    text-align: left;
+
+    background: #fff;
+    border: 1px solid rgba(2, 6, 23, 0.08);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-hover);
+}
+
+.suggestion-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(2, 6, 23, 0.05);
+}
+
+.suggestion-item:hover,
+.suggestion-item.active {
+    background-color: var(--color-primary-50);
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+/* Search results list */
+.list-group {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.list-group-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(2, 6, 23, 0.06);
+    border-radius: var(--radius-sm);
+    transition: background-color 0.2s ease, padding-left 0.2s ease;
+}
+
+.list-group-item:hover {
+    background-color: var(--color-primary-50);
+    padding-left: 22px;
+}
+
+.list-group-item:last-child {
+    border-bottom: none;
+}
+
+.list-group-item a {
+    color: var(--color-primary-700);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* ===================== BUTTONS & LINKS ===================== */
+
+.btn-zen {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 0;
+    padding: 12px 16px;
+    height: 44px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.btn-zen-primary {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-700) 100%);
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(110, 193, 255, 0.35);
+}
+
+.btn-zen-primary:hover {
+    background: var(--color-primary-700);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 28px rgba(43, 140, 255, 0.35);
+}
+
+.btn-zen-accent {
+    background: var(--color-accent);
+    color: var(--color-ink);
+    box-shadow: 0 6px 18px rgba(255, 179, 214, 0.45);
+}
+
+.btn-zen-accent:hover {
+    background: var(--color-accent-700);
+    color: #fff;
+}
+
+/* Search button (home page form): taller, shine sweep on hover */
+#searchForm .btn-zen {
+    position: relative;
+    overflow: hidden;
+    height: 52px;
+    font-size: 1rem;
+    letter-spacing: 0.3px;
+}
+#searchForm .btn-zen::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -80%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.6s ease;
+}
+#searchForm .btn-zen:hover::before {
+    left: 130%;
+}
+#searchForm .btn-zen:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.link-zen {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.link-zen:hover {
+    color: var(--color-accent-700);
+    text-decoration: underline;
+}
+
+/* ===================== INPUTS ===================== */
+
+.input-zen,
+input[type="text"],
+input[type="search"],
+input[type="email"],
+input[type="number"],
+select,
+textarea {
+    background: #fff;
+    border: 1px solid rgba(2, 6, 23, 0.08);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    color: var(--color-ink);
+}
+
+.input-zen:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--color-primary-200);
+    box-shadow: 0 0 0 4px rgba(110, 193, 255, 0.25);
+}
+
+/* ===================== DISCLAIMER & MEDICINE CARD ===================== */
+
 .disclaimer {
     background: var(--color-accent-50);
     border: 1px solid rgba(255, 79, 154, 0.2);
@@ -204,8 +517,7 @@ body {
 }
 
 .medicine-card {
-    margin: 0 auto;
-    margin-top: 32px;
+    margin: 32px auto 0;
     max-width: 100%;
     min-height: 220px;
     background: #fff;
@@ -213,7 +525,8 @@ body {
     border: 1px solid #e3e3e3;
     padding: 24px 18px;
 }
-@media (max-width:767px) {
+
+@media (max-width: 767px) {
     .medicine-card .row > div {
         border-right: none !important;
         border-bottom: 1px solid #f0f0f0;
@@ -221,7 +534,17 @@ body {
     }
 }
 
-/* Global alerts (messages framework) */
+/* ===================== OLD BOOTSTRAP HELPERS (still used in templates) ===================== */
+
+.text-center { text-align: center; }
+.text-muted  { color: var(--color-subtle); }
+.d-block     { display: block; }
+.mb-3 { margin-bottom: 16px; }
+.mb-4 { margin-bottom: 24px; }
+.mt-3 { margin-top: 16px; }
+
+/* ===================== ALERTS ===================== */
+
 .alert {
     padding: 12px 16px;
     margin-bottom: 16px;
@@ -230,11 +553,13 @@ body {
     font-weight: 500;
     text-align: center;
 }
+
 .alert-success {
     background: #ecfdf5;
     color: #065f46;
     border: 1px solid #a7f3d0;
 }
+
 .alert-error {
     background: #fef2f2;
     color: #991b1b;
